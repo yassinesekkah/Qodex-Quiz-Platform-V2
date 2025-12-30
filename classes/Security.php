@@ -69,12 +69,12 @@ class Security {
         if(!self::isLoggedIn()){
             return;
         }
-        if($_SESSION['role'] === 'enseignant'){
-            header ("../teacher/dashboard.php");
+        if(self::isTeacher()){
+            header ("Location: ../teacher/dashboard.php");
             exit();
         }
-        if($_SESSION['role'] === 'etudiant'){
-            header ("../student/dashboard.php");
+        if(self::isStudent()){
+            header ("Location: ../student/dashboard.php");
             exit();
         }
     }
