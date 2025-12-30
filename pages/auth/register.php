@@ -9,9 +9,15 @@ require_once '../../classes/Database.php';
 require_once '../../classes/Security.php';
 
 // Si déjà connecté, rediriger
-if (Security::isLoggedIn()) {
-    header('Location: ../teacher/dashboard.php');
-    exit();
+if (Security::isLoggedIn() ) {
+    if($_SESSION['role'] === 'enseignant'){
+        header("Location: ../teacher/dashboard.php");
+            exit();
+    }
+    if($_SESSION['role'] === 'etudiant'){
+        header("Location: ../student/dashboard.php");
+        exit();
+    }
 }
 
 // Récupérer les messages d'erreur

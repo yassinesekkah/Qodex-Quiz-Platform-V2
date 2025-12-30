@@ -64,7 +64,7 @@ class Security {
     }
     
     // Vérifie si l'utilisateur est enseignant
-     
+      
     public static function isTeacher() {
         return self::isLoggedIn() && $_SESSION['user_role'] === 'enseignant';
     }
