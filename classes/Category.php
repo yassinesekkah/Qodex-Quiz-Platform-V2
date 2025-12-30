@@ -106,10 +106,19 @@ class Category {
     }
     
     // Récupère toutes les catégories (pour les sélections)
-    
     public function getAll() {
         $sql = "SELECT * FROM categories ORDER BY nom ASC";
         $result = $this->db->query($sql);
         return $result->fetchAll();
+    }
+    // Récupère toutes les catégories avec calculer les quiz entre chaque category active pour l'etudiant affichage
+    public function getAllWithQuizcount(){
+        $sql = "SELECT c.*, COUNT(q.id) as quiz_count FROM categories c
+                left JOIN quiz q ON c.id = q.categorie_id AND q.is_active
+                GROUP BY c.id
+                ORDER BY c.nom";
+        
+        $result = $this -> db -> query($sql);
+        return $result -> fetchAll();
     }
 }
