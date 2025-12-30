@@ -32,19 +32,21 @@ $categories = $categoryObj->getAllWithQuizcount();
             $color = $colors[$index % count($colors)];
             $logo = $logos[$index % count($logos)];
         ?>
-            <div onclick="showStudentSection('categoryQuizzes', 'HTML/CSS')" class="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group cursor-pointer">
-                <div class="bg-gradient-to-br from-<?= $color ?>-500 to-<?= $color ?>-600 p-6 text-white">
-                    <i class="<?= $logo ?> text-4xl mb-3"></i>
-                    <h3 class="text-xl font-bold"><?= $category['nom'] ?></h3>
-                </div>
-                <div class="p-6">
-                    <p class="text-gray-600 mb-4"><?= $category['description'] ?></p>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-gray-500"><i class="fas fa-clipboard-list mr-2"></i><?= $category['quiz_count'] ?> quiz</span>
-                        <span class="text-green-600 font-semibold group-hover:translate-x-2 transition-transform">Explorer →</span>
+            <a href="quizzes.php?category_id=<?= $category['id'] ?>">
+                <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group cursor-pointer">
+                    <div class="bg-gradient-to-br from-<?= $color ?>-500 to-<?= $color ?>-600 p-6 text-white">
+                        <i class="<?= $logo ?> text-4xl mb-3"></i>
+                        <h3 class="text-xl font-bold"><?= $category['nom'] ?></h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4"><?= $category['description'] ?></p>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-500"><i class="fas fa-clipboard-list mr-2"></i><?= $category['quiz_count'] ?> quiz</span>
+                            <span class="text-green-600 font-semibold group-hover:translate-x-2 transition-transform">Explorer →</span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
         <?php endforeach ?>
 
         <!-- <div onclick="showStudentSection('categoryQuizzes', 'JavaScript')" class="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group cursor-pointer">
