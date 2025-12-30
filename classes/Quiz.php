@@ -130,4 +130,12 @@ class Quiz {
         $result = $this->db->query($sql, [$quizId]);
         return $result->fetch();
     }
+
+    // recupere les quiz dans une category avec category_id weykono active
+
+    public function getActiveByCategory($categoryId){
+        $sql =  ("SELECT * FROM quiz WHERE categorie_id = ? AND is_active = 1");
+        $result = $this -> db -> query($sql, [$categoryId]);
+        return $result -> fetchAll();
+    }
 }
