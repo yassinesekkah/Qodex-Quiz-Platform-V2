@@ -16,10 +16,6 @@ $pageTitle = 'Tableau de bord';
 $studentId = $_SESSION['user_id'];
 $userName = $_SESSION['user_nom'];
 
-
-
-
-
 ?>
 
 <h1>Bienvenue <?= htmlspecialchars($userName) ?></h1>
