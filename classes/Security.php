@@ -62,6 +62,22 @@ class Security {
     public static function isLoggedIn() {
         return isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
     }
+
+    //rediction 3la hsabb role
+
+    public static function redirectIfLoggedIn(){
+        if(!self::isLoggedIn()){
+            return;
+        }
+        if($_SESSION['role'] === 'enseignant'){
+            header ("../teacher/dashboard.php");
+            exit();
+        }
+        if($_SESSION['role'] === 'etudiant'){
+            header ("../student/dashboard.php");
+            exit();
+        }
+    }
     
     // Vérifie si l'utilisateur est enseignant
       

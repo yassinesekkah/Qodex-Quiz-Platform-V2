@@ -9,16 +9,7 @@ require_once '../../classes/Database.php';
 require_once '../../classes/Security.php';
 
 // Si déjà connecté, rediriger
-if (Security::isLoggedIn() ) {
-    if($_SESSION['role'] === 'enseignant'){
-        header("Location: ../teacher/dashboard.php");
-            exit();
-    }
-    if($_SESSION['role'] === 'etudiant'){
-        header("Location: ../student/dashboard.php");
-        exit();
-    }
-}
+if (Security::redirectIfLoggedIn() ) 
 
 // Récupérer les messages d'erreur
 $error = $_SESSION['register_error'] ?? '';
