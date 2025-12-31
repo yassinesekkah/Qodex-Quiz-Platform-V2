@@ -5,6 +5,7 @@ require_once '../../classes/Database.php';
 require_once '../../classes/Security.php';
 require_once '../../classes/Category.php';
 require_once '../../classes/Quiz.php';
+require_once '../../classes/Attempt.php';
 
 
 Security::requireStudent();
@@ -30,11 +31,15 @@ if (!$isIdOnDb) {
 }
 
 $quizObj = new Quiz;
+
 $quizzes = $quizObj->getActiveByCategory($categoryId);
 
 
 $thisCategory = $category->getById($categoryId);
 // var_dump($thisCategory);
+
+$studentId = $_SESSION['user_id'];
+$attempt = new Attempt;
 
 ?>
 
@@ -68,30 +73,49 @@ $thisCategory = $category->getById($categoryId);
             ]; ?>
 
             <?php foreach ($quizzes as $index => $quiz): ?>
-                <?php $color = $colors[$index % count($colors)]; ?>
-                <?php $logo = $logos[$index % count($logos)]; ?>
-                <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden">
+                <?php
+                $color = $colors[$index % count($colors)];
+                $logo  = $logos[$index % count($logos)];
+                $passed = $attempt->hasAttempt($studentId, $quiz['id']);
+                ?>
 
-                    <div class="bg-<?= $color ?>-600 text-white p-6">
-                        <i class="<?= $logo ?> text-4xl mb-3"></i>
-                        <h3 class="text-lg font-bold">
-                            <?= htmlspecialchars($quiz['titre']) ?>
-                        </h3>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+
+                    <div class="bg-<?= $color ?>-600 text-white p-6 flex items-center justify-between">
+                        <div>
+                            <i class="<?= $logo ?> text-4xl mb-2"></i>
+                            <h3 class="text-lg font-bold">
+                                <?= htmlspecialchars($quiz['titre']) ?>
+                            </h3>
+                        </div>
+
+                        <?php if ($passed): ?>
+                            <span class="bg-white text-<?= $color ?>-600 text-xs font-semibold px-3 py-1 rounded-full">
+                                Déjà passé
+                            </span>
+                        <?php endif; ?>
                     </div>
 
-                    <!-- Body -->
                     <div class="p-6">
                         <p class="text-gray-600 mb-4 text-sm">
                             <?= htmlspecialchars(substr($quiz['description'] ?? '', 0, 100)) ?>
                         </p>
 
-                        <a href="../../actions/student/start_quiz.php?quiz_id=<?= $quiz['id'] ?>&category_id=<?= $categoryId ?>"
-                            class="block w-full text-center bg-<?= $color ?>-600 text-white py-2 rounded-lg font-semibold hover:bg-<?= $color ?>-700 transition">
-                            Passer le quiz
-                        </a>
+                        <?php if (!$passed): ?>
+                            <a href="../../actions/student/start_quiz.php?quiz_id=<?= $quiz['id'] ?>&category_id=<?= $categoryId ?>"
+                                class="block w-full text-center bg-<?= $color ?>-600 text-white py-2 rounded-lg font-semibold">
+                                Passer le quiz
+                            </a>
+                        <?php else: ?>
+                            <a href="../../pages/student/quiz_result.php?quiz_id=<?= $quiz['id'] ?>"
+                                class="block w-full text-center bg-gray-600 text-white py-2 rounded-lg font-semibold">
+                                Voir le résultat
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
+
         </div>
     </div>
 </div>
