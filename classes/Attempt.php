@@ -19,4 +19,13 @@ class Attempt
         $attempts = $result['attempts'];
         return $attempts > 0 ;
     }
+
+    public function createAttempt ($studentId, $quizId)
+    {
+        $sql = ("INSERT INTO attempts (student_id, quiz_id, started_at, is_finished) VALUES (?, ?, NOW(), 0);");
+        $result = $this -> db -> query($sql, [$studentId, $quizId]);
+        return true;
+    }
+
+
 }

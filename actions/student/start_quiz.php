@@ -5,6 +5,7 @@ require_once '../../classes/Database.php';
 require_once '../../classes/Security.php';
 require_once '../../classes/Category.php';
 require_once '../../classes/Quiz.php';
+require_once '../../classes/Attempt.php';
 
 Security::requireStudent();
 ///check wach kayen quiz_id f lien
@@ -55,9 +56,9 @@ if (!$isActive) {
 }
 
 $attempt = new Attempt;
-$hasAttempt = $attempt -> hasAttempt($studentId, $quizId);
+$hasAttempt = $attempt->hasAttempt($studentId, $quizId);
 
-if($hasAttempt){
+if ($hasAttempt) {
     if (isset($_GET['category_id']) && ctype_digit($_GET['category_id'])) {
         header("Location: ../../pages/student/quizzes.php?category_id=" . $_GET['category_id']);
     } else {
@@ -66,3 +67,16 @@ if($hasAttempt){
     exit;
 }
 
+$startAttempt = $attempt->createAttempt($studentId, $quizId);
+
+if ($startAttempt) {
+    header("Location: ../../pages/student/quiz_pass.php?quiz_id=" . $quizId);
+    exit;
+} else {
+    if (isset($_GET['category_id']) && ctype_digit($_GET['category_id'])) {
+        header("Location: ../../pages/student/quizzes.php?category_id=" . $_GET['category_id']);
+    } else {
+        header("Location: ../../pages/student/categories.php");
+    }
+    exit;
+}
