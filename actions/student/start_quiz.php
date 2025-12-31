@@ -19,7 +19,7 @@ if (!isset($_GET['quiz_id'])) {
     exit;
 }
 $quizId = $_GET['quiz_id'];
-$userId = $_SESSION['user_id'];
+$studentId = $_SESSION['user_id'];
 
 /// check wach int mojab
 if (!ctype_digit($_GET['quiz_id'])) {
@@ -55,4 +55,14 @@ if (!$isActive) {
 }
 
 $attempt = new Attempt;
+$hasAttempt = $attempt -> hasAttempt($studentId, $quizId);
+
+if($hasAttempt){
+    if (isset($_GET['category_id']) && ctype_digit($_GET['category_id'])) {
+        header("Location: ../../pages/student/quizzes.php?category_id=" . $_GET['category_id']);
+    } else {
+        header("Location: ../../pages/student/categories.php");
+    }
+    exit;
+}
 
