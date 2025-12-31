@@ -4,7 +4,7 @@ class Attempt
 {
     private $db;
 
-    public function __construct($db)
+    public function __construct()
     {
         $this -> db = Database::getInstance();
     }

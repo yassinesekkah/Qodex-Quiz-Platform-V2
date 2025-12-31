@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require_once '../../config/database.php';
 require_once '../../classes/Database.php';
@@ -7,26 +7,52 @@ require_once '../../classes/Category.php';
 require_once '../../classes/Quiz.php';
 
 Security::requireStudent();
-
+///check wach kayen quiz_id f lien
 if (!isset($_GET['quiz_id'])) {
     $catId = $_GET['category_id'];
 
-    if($catId){
+    if ($catId) {
         header("Location: ../../pages/student/quizzes.php?category_id=" . $catId);
-    }else{
+    } else {
+        header("Location: ../../pages/student/categories.php");
+    }
+    exit;
+}
+$quizId = $_GET['quiz_id'];
+$userId = $_SESSION['user_id'];
+
+/// check wach int mojab
+if (!ctype_digit($_GET['quiz_id'])) {
+    if (isset($_GET['category_id']) && ctype_digit($_GET['category_id'])) {
+        header("Location: ../../pages/student/quizzes.php?category_id=" . $_GET['category_id']);
+    } else {
+        header("Location: ../../pages/student/categories.php");
+    }
+    exit;
+}
+//check wach kayen f database
+$quiz = new Quiz;
+$isOndbQuiz = $quiz->getById($quizId);
+
+if (!$isOndbQuiz) {
+    if (isset($_GET['category_id']) && ctype_digit($_GET['category_id'])) {
+        header("Location: ../../pages/student/quizzes.php?category_id=" . $_GET['category_id']);
+    } else {
+        header("Location: ../../pages/student/categories.php");
+    }
+    exit;
+}
+///check wach l quiz active 
+$isActive = $quiz->isActive($quizId);
+
+if (!$isActive) {
+    if (isset($_GET['category_id']) && ctype_digit($_GET['category_id'])) {
+        header("Location: ../../pages/student/quizzes.php?category_id=" . $_GET['category_id']);
+    } else {
         header("Location: ../../pages/student/categories.php");
     }
     exit;
 }
 
-$quizId = $_GET['quiz_id'];
-$userId = $_SESSION['user_id'];
-
-if (!ctype_digit($_GET['quiz_id'])) {
-    header("Location: ../../pages/student/quizzes.php?category_id=" . $catId);
-    exit;
-}
-
-
-
+$attempt = new Attempt;
 

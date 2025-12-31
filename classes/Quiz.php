@@ -138,4 +138,12 @@ class Quiz {
         $result = $this -> db -> query($sql, [$categoryId]);
         return $result -> fetchAll();
     }
+
+    // recupere les quiz active
+
+    public function isActive($quiz_id){
+        $sql = ("SELECT * from quiz WHERE id = ? AND is_active = 1");
+        $result = $this -> db -> query ($sql, [$quiz_id]);
+        return $result -> fetch();
+    }
 }
