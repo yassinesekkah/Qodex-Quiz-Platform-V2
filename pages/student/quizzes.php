@@ -85,7 +85,7 @@ $thisCategory = $category->getById($categoryId);
                             <?= htmlspecialchars(substr($quiz['description'] ?? '', 0, 100)) ?>
                         </p>
 
-                        <a href="../../actions/student/start_quiz.php?category_id=<?= $categoryId ?>&quiz_id=<?= $quiz['id'] ?>"
+                        <a href="../../actions/student/start_quiz.php?quiz_id=<?= $quiz['id'] ?>&category_id=<?= $categoryId ?>"
                             class="block w-full text-center bg-<?= $color ?>-600 text-white py-2 rounded-lg font-semibold hover:bg-<?= $color ?>-700 transition">
                             Passer le quiz
                         </a>
