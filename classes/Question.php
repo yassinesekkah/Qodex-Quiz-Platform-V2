@@ -37,6 +37,13 @@ class Question {
         $result = $this->db->query($sql, [$quizId]);
         return $result->fetchAll();
     }
+    // Récupère toutes les questions d'un quiz pour etudiant
+    
+    public function getAllByQuizForStudent($quizId) {
+        $sql = "SELECT id, quiz_id, question, option1, option2, option3, option4, created_at FROM questions WHERE quiz_id = ? ORDER BY id ASC";
+        $result = $this->db->query($sql, [$quizId]);
+        return $result->fetchAll();
+    }
     
     // Récupère une question par ID
      
