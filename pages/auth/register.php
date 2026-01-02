@@ -9,7 +9,7 @@ require_once '../../classes/Database.php';
 require_once '../../classes/Security.php';
 
 // Si déjà connecté, rediriger
-if (Security::redirectIfLoggedIn() ) 
+if (Security::redirectIfLoggedIn() ) ;
 
 // Récupérer les messages d'erreur
 $error = $_SESSION['register_error'] ?? '';
