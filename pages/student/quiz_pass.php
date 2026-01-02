@@ -81,6 +81,7 @@ if (empty($questions)) {
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <form method="POST" action="../../actions/student/submit_quiz.php">
             <input type="hidden" name="quiz_id" value="<?= $quizId ?>">
+            <input type="hidden" name="answers" id="answersInput">
 
             <div class="bg-white rounded-xl shadow-lg p-8">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6" id="questionText">
@@ -88,7 +89,7 @@ if (empty($questions)) {
                 </h3>
 
                 <div class="space-y-4">
-                    <div onclick="selectAnswer(this)" class="answer-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
+                    <div onclick="selectAnswer(this)" data-option="1" class="answer-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
                         <div class="flex items-center">
                             <div class="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center mr-4 option-radio">
                                 <div class="w-4 h-4 rounded-full bg-green-600 hidden option-selected"></div>
@@ -97,7 +98,7 @@ if (empty($questions)) {
                         </div>
                     </div>
 
-                    <div onclick="selectAnswer(this)" class="answer-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
+                    <div onclick="selectAnswer(this)" data-option="2" class="answer-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
                         <div class="flex items-center">
                             <div class="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center mr-4 option-radio">
                                 <div class="w-4 h-4 rounded-full bg-green-600 hidden option-selected"></div>
@@ -106,7 +107,7 @@ if (empty($questions)) {
                         </div>
                     </div>
 
-                    <div onclick="selectAnswer(this)" class="answer-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
+                    <div onclick="selectAnswer(this)" data-option="3" class="answer-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
                         <div class="flex items-center">
                             <div class="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center mr-4 option-radio">
                                 <div class="w-4 h-4 rounded-full bg-green-600 hidden option-selected"></div>
@@ -115,7 +116,7 @@ if (empty($questions)) {
                         </div>
                     </div>
 
-                    <div onclick="selectAnswer(this)" class="answer-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
+                    <div onclick="selectAnswer(this)" data-option="4" class="answer-option p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-green-500 hover:bg-green-50 transition">
                         <div class="flex items-center">
                             <div class="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center mr-4 option-radio">
                                 <div class="w-4 h-4 rounded-full bg-green-600 hidden option-selected"></div>
@@ -129,7 +130,7 @@ if (empty($questions)) {
                     <button onclick="previousQuestion()" type="button" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
                         <i class="fas fa-arrow-left mr-2"></i>Précédent
                     </button>
-                    <button id="suivantBtn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    <button type="button" id="suivantBtn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
                         <i class="fas fa-arrow-right ml-2"></i>
                     </button>
                 </div>
@@ -143,8 +144,55 @@ if (empty($questions)) {
     const questions = <?= json_encode($questions, JSON_UNESCAPED_UNICODE); ?>;
     console.log(questions);
 
+    let answers = {};
+
     let index = 0;
     const suivantBtn = document.getElementById("suivantBtn");
+
+    function resetOptionsUI() {
+        document.querySelectorAll('.answer-option').forEach(option => {
+            option.classList.remove('border-green-500', 'bg-green-50');
+            option.querySelector('.option-selected').classList.add('hidden');
+        });
+    }
+
+    function updateButton() {
+        const currentQuestionId = questions[index].id;
+        const answered = !!answers[currentQuestionId];
+
+        if (index === questions.length - 1) {
+            suivantBtn.innerText = "Soumettre";
+            suivantBtn.onclick = submitQuiz;
+        } else {
+            suivantBtn.innerText = "Suivant";
+            suivantBtn.onclick = nextQuestion;
+        }
+
+       
+        suivantBtn.disabled = !answered;
+    }
+
+
+    function selectAnswer(element) {
+        const selectedOption = element.dataset.option;
+        const questionId = questions[index].id;
+
+        
+        resetOptionsUI();
+
+      
+        element.classList.add('border-green-500', 'bg-green-50');
+        element.querySelector('.option-selected').classList.remove('hidden');
+
+    
+        answers[questionId] = selectedOption;
+
+        console.log(answers);
+
+    
+        updateButton();
+    }
+
 
     function showQuestion() {
         const q = questions[index];
@@ -154,19 +202,32 @@ if (empty($questions)) {
         document.getElementById("option2").innerText = q.option2;
         document.getElementById("option3").innerText = q.option3;
         document.getElementById("option4").innerText = q.option4;
-        if (index < questions.length - 1) {
-            suivantBtn.type = "button";
-            suivantBtn.innerText = "Suivant";
-            suivantBtn.onclick = nextQuestion;
-        } else {
-            suivantBtn.type = "submit";
-            suivantBtn.innerText = "Soumettre";
-            suivantBtn.onclick = null;
+
+        resetOptionsUI();
+
+        // restore answer if exists
+        if (answers[q.id]) {
+            const selectedEl = document.querySelector(
+                `.answer-option[data-option="${answers[q.id]}"]`
+            );
+            if (selectedEl) {
+                selectedEl.classList.add('border-green-500', 'bg-green-50');
+                selectedEl.querySelector('.option-selected').classList.remove('hidden');
+            }
         }
+
+        updateButton();
     }
+
     showQuestion();
 
     function nextQuestion() {
+        const currentQuestionId = questions[index].id;
+
+        if (!answers[currentQuestionId]) {
+            alert("Veuillez répondre à la question");
+            return;
+        }
 
         if (index < questions.length - 1) {
             index++;
@@ -174,11 +235,24 @@ if (empty($questions)) {
         }
     }
 
+
     function previousQuestion() {
         if (index > 0) {
             index--;
             showQuestion();
         }
     }
+
+    function submitQuiz() {
+        const currentQuestionId = questions[index].id;
+
+        if (!answers[currentQuestionId]) {
+            alert("Veuillez répondre à la question");
+            return;
+        }
+        document.getElementById("answersInput").value = JSON.stringify(answers);
+        document.querySelector("form").submit();
+    }
+    F
 </script>
 <?php include '../partials/footer.php'; ?>
