@@ -30,29 +30,23 @@ if (!$quiz->isActive($quizId)) {
     exit;
 }
 ///check attempt wach kayen
-$attempt = new Attempt;
-$hasAttempt = $attempt->hasAttempt($studentId, $quizId);
-if (!$hasAttempt) {
+$attemptObj = new Attempt();
+
+// كنقلبو على attempt (سواء مفتوحة أو مسدودة)
+$attempt = $attemptObj->getOpenAttempt($studentId, $quizId);
+
+if (!$attempt) {
+    // ما كايناش attempt مفتوحة → ما خاصوش يدخل
     header('Location: quizzes.php?category_id=' . $quizData['categorie_id']);
     exit;
 }
+
+
 ///njibo questions
 $questionsObj = new Question;
 $questions = $questionsObj->getAllByQuizForStudent($quizId);
 $questionsCount = $questionsObj->countByQuiz($quizId);
 //transfer $questions to json file
-
-// var_dump($questionsCount);
-// var_dump($questions);
-// array(2) { [0]=> array(9) { ["id"]=> int(13) ["quiz_id"]=> int(3) 
-//     ["question"]=> string(20) "Non non eiusmod veni" ["option1"]=> string(20) "Sunt nostrud laborum" 
-//     ["option2"]=> string(19) "Rerum voluptatem Mo" ["option3"]=> string(20) "Autem facilis accusa" 
-//     ["option4"]=> string(20) "Molestiae quia ex au" ["correct_option"]=> int(1) 
-//     ["created_at"]=> string(19) "2025-12-25 22:23:37" } [1]=> array(9) { ["id"]=> int(14) 
-//         ["quiz_id"]=> int(3) ["question"]=> string(19) "Eaque rerum numquam" 
-//         ["option1"]=> string(19) "Voluptas laboriosam" ["option2"]=> string(19) "Sit reiciendis nemo" 
-//         ["option3"]=> string(20) "Laboris necessitatib" ["option4"]=> string(19) 
-//     "Fugiat ut facilis a" ["correct_option"]=> int(2) ["created_at"]=> string(19) "2025-12-25 22:23:37" } }
 
 if (empty($questions)) {
     header('Location: quizzes.php?category_id=' . $quizData['categorie_id']);
@@ -161,35 +155,43 @@ if (empty($questions)) {
         const answered = !!answers[currentQuestionId];
 
         if (index === questions.length - 1) {
+            // آخر سؤال
             suivantBtn.innerText = "Soumettre";
             suivantBtn.onclick = submitQuiz;
+
+            // ❌ ما تعطلش الزر
+            suivantBtn.disabled = false;
+
         } else {
+            // الأسئلة الأخرى
             suivantBtn.innerText = "Suivant";
             suivantBtn.onclick = nextQuestion;
-        }
 
-       
-        suivantBtn.disabled = !answered;
+            // هنا فقط نقدر نحبسو
+            suivantBtn.disabled = !answered;
+        }
     }
+
+
 
 
     function selectAnswer(element) {
         const selectedOption = element.dataset.option;
         const questionId = questions[index].id;
 
-        
+
         resetOptionsUI();
 
-      
+
         element.classList.add('border-green-500', 'bg-green-50');
         element.querySelector('.option-selected').classList.remove('hidden');
 
-    
+
         answers[questionId] = selectedOption;
 
         console.log(answers);
 
-    
+
         updateButton();
     }
 
@@ -242,17 +244,31 @@ if (empty($questions)) {
             showQuestion();
         }
     }
+    // /Qodex-Student Quiz-Platform-Version-2/actions/student/submit_quiz.php
 
     function submitQuiz() {
-        const currentQuestionId = questions[index].id;
+        console.log('SUBMIT CLICKED');
 
-        if (!answers[currentQuestionId]) {
-            alert("Veuillez répondre à la question");
-            return;
-        }
-        document.getElementById("answersInput").value = JSON.stringify(answers);
-        document.querySelector("form").submit();
+        fetch('../../actions/student/submit_quiz.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    quiz_id: <?= $quizId ?>,
+                    answers: answers
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href =
+                        '../../pages/student/quiz_result.php?attempt_id=' + data.attempt_id;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => console.error(err));
     }
-    F
 </script>
 <?php include '../partials/footer.php'; ?>
