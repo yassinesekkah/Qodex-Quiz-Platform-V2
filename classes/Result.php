@@ -21,18 +21,25 @@ class Result
      * @param int $etudiantId - L'ID de l'étudiant
      * @return array - Liste des résultats
      */
-    public function getMyResults($etudiantId)
+    public function getMyResults($studentId)
     {
-        $sql = "SELECT r.*, q.titre as quiz_titre, c.nom as categorie_nom
-                FROM results r
-                LEFT JOIN quiz q ON r.quiz_id = q.id
-                LEFT JOIN categories c ON q.categorie_id = c.id
-                WHERE r.etudiant_id = ?
-                ORDER BY r.created_at DESC";
+        $sql = "SELECT 
+                r.*,
+                q.titre AS quiz_titre,
+                c.nom AS categorie_nom,
+                a.started_at,
+                a.completed_at,
+                TIMESTAMPDIFF(SECOND, a.started_at, a.completed_at) AS duration_seconds
+            FROM results r
+            JOIN attempts a ON a.id = r.attempt_id
+            JOIN quiz q ON q.id = r.quiz_id
+            JOIN categories c ON c.id = q.categorie_id
+            WHERE r.etudiant_id = ?
+            ORDER BY r.created_at DESC";
 
-        $result = $this->db->query($sql, [$etudiantId]);
-        return $result->fetchAll();
+        return $this->db->query($sql, [$studentId])->fetchAll();
     }
+
 
     /**
      * Récupère un résultat par ID (vérifie que c'est bien le propriétaire)
@@ -68,9 +75,53 @@ class Result
             $this->db->query($sql, [$quizId, $etudiantId, $score, $totalQuestions]);
             return $this->db->getConnection()->lastInsertId();
         } catch (Exception $e) {
-            return false;
+            throw $e;
         }
     }
+
+    public function saveFromAttempt(
+        int $attemptId,
+        int $quizId,
+        int $etudiantId,
+        int $score,
+        int $totalQuestions,
+        float $percentage
+    ): bool {
+        $sql = "INSERT INTO results
+            (attempt_id, quiz_id, etudiant_id, score, total_questions, percentage, completed_at, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())";
+
+        $this->db->query($sql, [
+            $attemptId,
+            $quizId,
+            $etudiantId,
+            $score,
+            $totalQuestions,
+            $percentage
+        ]);
+
+        return true;
+    }
+
+    public function getByAttempt(int $attemptId, int $etudiantId)
+    {
+        $sql = "SELECT 
+                r.*,
+                q.titre AS quiz_titre,
+                c.nom AS categorie_nom,
+                a.started_at,
+                a.completed_at
+            FROM results r
+            JOIN attempts a ON a.id = r.attempt_id
+            JOIN quiz q ON q.id = r.quiz_id
+            JOIN categories c ON c.id = q.categorie_id
+            WHERE r.attempt_id = ? AND r.etudiant_id = ?
+            LIMIT 1";
+
+        return $this->db->query($sql, [$attemptId, $etudiantId])->fetch();
+    }
+
+
 
     /**
      * Calcule les statistiques d'un étudiant

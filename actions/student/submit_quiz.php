@@ -5,8 +5,9 @@ require_once '../../config/database.php';
 require_once '../../classes/Database.php';
 require_once '../../classes/Attempt.php';
 require_once '../../classes/Question.php';
+require_once '../../classes/Result.php';
 
-/* 1️⃣ Vérifier student */
+
 if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'success' => false,
@@ -17,7 +18,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $studentId = $_SESSION['user_id'];
 
-/* 2️⃣ Lire JSON */
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!$data || !isset($data['quiz_id'], $data['answers'])) {
@@ -31,7 +31,6 @@ if (!$data || !isset($data['quiz_id'], $data['answers'])) {
 $quizId  = (int) $data['quiz_id'];
 $answers = $data['answers'];
 
-/* 3️⃣ Vérifier attempt ouverte */
 $attemptObj = new Attempt();
 $attempt = $attemptObj->getOpenAttempt($studentId, $quizId);
 
@@ -43,7 +42,6 @@ if (!$attempt) {
     exit;
 }
 
-/* 4️⃣ Correction */
 $questionObj = new Question();
 $questions = $questionObj->getQuestionsWithCorrectOption($quizId);
 
@@ -58,10 +56,20 @@ foreach ($questions as $q) {
     }
 }
 
-/* 5️⃣ Fermer attempt */
 $attemptObj->finishAttempt($attempt['id']);
 
-/* 6️⃣ Réponse JSON */
+$totalQuestions = count($questions);
+$percentage = ($score / $totalQuestions) * 100;
+
+$result = new Result;
+$saveResult = $result -> saveFromAttempt(
+    $attempt['id'],
+    $quizId,
+    $studentId,
+    $score,
+    $totalQuestions,
+    $percentage
+);
 echo json_encode([
     'success' => true,
     'attempt_id' => $attempt['id'],
