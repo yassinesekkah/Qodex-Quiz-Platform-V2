@@ -34,8 +34,6 @@ $quizObj = new Quiz;
 
 $quizzes = $quizObj->getActiveByCategory($categoryId);
 
-
-$thisCategory = $category->getById($categoryId);
 // var_dump($thisCategory);
 
 $studentId = $_SESSION['user_id'];
@@ -53,7 +51,7 @@ $attempt = new Attempt;
         <!-- Header -->
         <div class="mb-8">
             <h2 class="text-3xl font-bold text-gray-900">
-                <?= htmlspecialchars($thisCategory['nom']) ?>
+                <?= htmlspecialchars($isIdOnDb['nom']) ?>
             </h2>
             <p class="text-gray-600 mt-2">
                 Évaluez vos compétences à travers ces quiz
