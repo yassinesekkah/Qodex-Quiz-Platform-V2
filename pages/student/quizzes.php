@@ -59,8 +59,10 @@ $attempt = new Attempt;
         </div>
 
         <!-- Liste des quiz -->
+        <!-- Liste des quiz -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <?php $colors = ['indigo', 'blue', 'green', 'purple', 'pink', 'orange'];
+            <?php
+            $colors = ['indigo', 'blue', 'green', 'purple', 'pink', 'orange'];
             $logos = [
                 'fa-solid fa-database',
                 'fa-regular fa-file-code',
@@ -68,15 +70,17 @@ $attempt = new Attempt;
                 'fa-solid fa-terminal',
                 'fa-solid fa-microchip',
                 'fa-solid fa-server'
-            ]; ?>
+            ];
+            ?>
 
             <?php foreach ($quizzes as $index => $quiz): ?>
                 <?php
                 $color = $colors[$index % count($colors)];
                 $logo  = $logos[$index % count($logos)];
-                $passed = $attempt->hasAttempt($studentId, $quiz['id']);
-                ?>
 
+                $hasOpen     = $attempt->hasOpenAttempt($studentId, $quiz['id']);
+                $hasFinished = $attempt->hasFinishedAttempt($studentId, $quiz['id']);
+                ?>
                 <div class="bg-white rounded-xl shadow-md overflow-hidden">
 
                     <div class="bg-<?= $color ?>-600 text-white p-6 flex items-center justify-between">
@@ -87,9 +91,13 @@ $attempt = new Attempt;
                             </h3>
                         </div>
 
-                        <?php if ($passed): ?>
+                        <?php if ($hasFinished): ?>
                             <span class="bg-white text-<?= $color ?>-600 text-xs font-semibold px-3 py-1 rounded-full">
                                 Déjà passé
+                            </span>
+                        <?php elseif ($hasOpen): ?>
+                            <span class="bg-white text-orange-600 text-xs font-semibold px-3 py-1 rounded-full">
+                                En cours
                             </span>
                         <?php endif; ?>
                     </div>
@@ -99,22 +107,29 @@ $attempt = new Attempt;
                             <?= htmlspecialchars(substr($quiz['description'] ?? '', 0, 100)) ?>
                         </p>
 
-                        <?php if (!$passed): ?>
-                            <a href="../../actions/student/start_quiz.php?quiz_id=<?= $quiz['id'] ?>&category_id=<?= $categoryId ?>"
-                                class="block w-full text-center bg-<?= $color ?>-600 text-white py-2 rounded-lg font-semibold">
-                                Passer le quiz
-                            </a>
-                        <?php else: ?>
+                        <?php if ($hasFinished): ?>
                             <a href="../../pages/student/quiz_result.php?quiz_id=<?= $quiz['id'] ?>"
                                 class="block w-full text-center bg-gray-600 text-white py-2 rounded-lg font-semibold">
                                 Voir le résultat
+                            </a>
+
+                        <?php elseif ($hasOpen): ?>
+                            <a href="../../pages/student/quiz_pass.php?quiz_id=<?= $quiz['id'] ?>"
+                                class="block w-full text-center bg-orange-600 text-white py-2 rounded-lg font-semibold">
+                                Continuer le quiz
+                            </a>
+
+                        <?php else: ?>
+                            <a href="../../actions/student/start_quiz.php?quiz_id=<?= $quiz['id'] ?>&category_id=<?= $categoryId ?>"
+                                class="block w-full text-center bg-<?= $color ?>-600 text-white py-2 rounded-lg font-semibold">
+                                Passer le quiz
                             </a>
                         <?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
-
         </div>
+
     </div>
 </div>
 

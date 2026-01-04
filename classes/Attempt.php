@@ -17,6 +17,7 @@ class Attempt
         $rows = $this->db->query($sql, [$studentId, $quizId]);
         $result =  $rows->fetch();
         $attempts = $result['attempts'];
+
         return $attempts > 0;
     }
 
@@ -48,20 +49,21 @@ class Attempt
         $stmt = $this->db->query($sql, [$studentId, $quizId]);
         return $stmt->fetch();
     }
-    public function hasFinishedAttempt($studentId, $quizId)
-    {
-        $sql = "SELECT 1 FROM attempts
-            WHERE student_id = ?
-              AND quiz_id = ?
-              AND is_finished = 1
-            LIMIT 1";
-    }
     public function hasOpenAttempt($studentId, $quizId)
     {
-        $sql = "SELECT 1 FROM attempts
-            WHERE student_id = ?
-              AND quiz_id = ?
-              AND is_finished = 0
-            LIMIT 1";
+        $sql = "SELECT COUNT(*) 
+            FROM attempts
+            WHERE student_id = ? AND quiz_id = ? AND is_finished = 0";
+
+        return $this->db->query($sql, [$studentId, $quizId])->fetchColumn() > 0;
+    }
+
+    public function hasFinishedAttempt($studentId, $quizId)
+    {
+        $sql = "SELECT COUNT(*) 
+            FROM attempts
+            WHERE student_id = ? AND quiz_id = ? AND is_finished = 1";
+
+        return $this->db->query($sql, [$studentId, $quizId])->fetchColumn() > 0;
     }
 }
