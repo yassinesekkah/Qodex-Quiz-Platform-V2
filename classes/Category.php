@@ -136,4 +136,15 @@ class Category
         $result = $this->db->query($sql);
         return $result->fetchAll();
     }
+
+    public function countCategoriesWithActiveQuiz()
+    {
+        $sql = "SELECT COUNT(DISTINCT c.id) AS total
+            FROM categories c
+            JOIN quiz q ON q.categorie_id = c.id
+            WHERE q.is_active = 1";
+
+        $result = $this->db->query($sql);
+        return $result->fetch()['total'];
+    }
 }

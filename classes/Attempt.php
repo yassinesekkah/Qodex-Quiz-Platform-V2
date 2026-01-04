@@ -48,4 +48,20 @@ class Attempt
         $stmt = $this->db->query($sql, [$studentId, $quizId]);
         return $stmt->fetch();
     }
+    public function hasFinishedAttempt($studentId, $quizId)
+    {
+        $sql = "SELECT 1 FROM attempts
+            WHERE student_id = ?
+              AND quiz_id = ?
+              AND is_finished = 1
+            LIMIT 1";
+    }
+    public function hasOpenAttempt($studentId, $quizId)
+    {
+        $sql = "SELECT 1 FROM attempts
+            WHERE student_id = ?
+              AND quiz_id = ?
+              AND is_finished = 0
+            LIMIT 1";
+    }
 }
