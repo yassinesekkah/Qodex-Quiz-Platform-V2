@@ -146,4 +146,11 @@ class Quiz {
         $result = $this -> db -> query ($sql, [$quiz_id]);
         return $result -> fetch();
     }
+
+    /// recupere le nombre des quizzes active pour le dashboard 
+    public function countActiveQuizzes(){
+        $sql = ("SELECT COUNT(*) AS total FROM quiz WHERE is_active = 1");
+        $result = $this -> db -> query ($sql);
+        return $result -> fetch()['total'];
+    }
 }

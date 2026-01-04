@@ -54,7 +54,7 @@ if (empty($questions)) {
 }
 ?>
 <?php include '../partials/header.php'; ?>
-<?php include '../partials/nav_teacher.php'; ?>
+<?php include '../partials/nav_student.php'; ?>
 
 <div id="takeQuiz" class="student-section py-16">
     <div class="bg-gradient-to-r from-green-600 to-teal-600 text-white">

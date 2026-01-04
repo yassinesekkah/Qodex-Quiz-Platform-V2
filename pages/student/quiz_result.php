@@ -38,7 +38,7 @@ $percentage = 0;
 ?>
 
 <?php include '../partials/header.php'; ?>
-<?php include '../partials/nav_teacher.php'; ?>
+<?php include '../partials/nav_student.php'; ?>
 
 <!-- Results Table -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden">
